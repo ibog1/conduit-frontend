@@ -108,14 +108,17 @@ deleteArticle(): void {
       takeUntilDestroyed(this.destroyRef),
       catchError((error) => {
         console.error('Delete failed:', error);
-        this.isDeleting = false;  // ← FIX!
+        this.isDeleting = false;
         return EMPTY;
       })
     )
-    .subscribe(() => {
-      void this.router.navigate(["/"]);
+    .subscribe({
+      next: () => {
+        void this.router.navigate(["/"]);
+      }
     });
 }
+
   
   addComment() {
     this.isSubmitting = true;
