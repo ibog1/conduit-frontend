@@ -5,8 +5,8 @@ RUN npm ci
 COPY . .
 
 
-ARG API_URL                           
-ENV NG_APP_API_URL=$API_URL
+ARG API_URL
+ENV API_URL=$API_URL
 RUN npm run build -- --configuration production 
 
 FROM nginx:alpine
