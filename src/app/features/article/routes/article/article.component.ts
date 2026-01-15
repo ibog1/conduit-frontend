@@ -12,7 +12,7 @@ import { MarkdownPipe } from "../../../../shared/pipes/markdown.pipe";
 import { ListErrorsComponent } from "../../../../shared/components/list-errors.component";
 import { ArticleCommentComponent } from "../../components/article-comment.component";
 import { catchError } from "rxjs/operators";
-import { combineLatest, throwError } from "rxjs";
+import { combineLatest, throwError, EMPTY } from "rxjs";
 import { Comment } from "../../models/comment.model";
 import { IfAuthenticatedDirective } from "../../../../shared/directives/if-authenticated.directive";
 import { Errors } from "../../../../core/models/errors.model";
@@ -99,17 +99,27 @@ export default class ArticleComponent implements OnInit {
     this.article.author.following = profile.following;
   }
 
-  deleteArticle(): void {
-    this.isDeleting = true;
+deleteArticle(): void {
+  this.isDeleting = true;
 
-    this.articleService
-      .delete(this.article.slug)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
+  this.articleService
+    .delete(this.article.slug)
+    .pipe(
+      takeUntilDestroyed(this.destroyRef),
+      catchError((error) => {
+        console.error('Delete failed:', error);
+        this.isDeleting = false;
+        return EMPTY;
+      })
+    )
+    .subscribe({
+      next: () => {
         void this.router.navigate(["/"]);
-      });
-  }
+      }
+    });
+}
 
+  
   addComment() {
     this.isSubmitting = true;
     this.commentFormErrors = null;
